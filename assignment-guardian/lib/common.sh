@@ -7,8 +7,8 @@
 set -euo pipefail
 
 # -------------------- 路径常量 --------------------
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
+_LIB_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(dirname "$_LIB_DIR")"
 CONFIG_FILE="$PROJECT_ROOT/config/courses.conf"
 LOG_FILE="$PROJECT_ROOT/logs/guardian.log"
 LOG_DIR="$PROJECT_ROOT/logs"

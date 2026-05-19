@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__pdf-reader__textextraction__extract_text",
+      "Bash(git -C \"d:/25-26-2-homework/linux_project\" log --oneline -10)",
+      "Bash(git remote *)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)"
+    ]
+  }
+}

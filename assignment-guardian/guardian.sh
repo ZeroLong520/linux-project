@@ -18,11 +18,12 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # 加载模块库
+# 加载模块库（先 common，之后用 PROJECT_ROOT 定位）
 source "$SCRIPT_DIR/lib/common.sh"
-source "$SCRIPT_DIR/lib/deadline.sh"
-source "$SCRIPT_DIR/lib/checker.sh"
-source "$SCRIPT_DIR/lib/uploader.sh"
-source "$SCRIPT_DIR/lib/extractor.sh"
+source "$PROJECT_ROOT/lib/deadline.sh"
+source "$PROJECT_ROOT/lib/checker.sh"
+source "$PROJECT_ROOT/lib/uploader.sh"
+source "$PROJECT_ROOT/lib/extractor.sh"
 
 # -------------------- 帮助信息 --------------------
 show_help() {
