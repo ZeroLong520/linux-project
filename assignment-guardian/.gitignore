@@ -1,0 +1,6 @@
+logs/*.log
+*.tar.gz
+*.zip
+__pycache__/
+.DS_Store
+fixtures/
