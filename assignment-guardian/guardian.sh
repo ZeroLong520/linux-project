@@ -30,8 +30,7 @@ show_help() {
     echo "用法: ./guardian.sh <命令> [参数]"
     echo ""
     echo "命令:"
-    echo "  check              扫描作业截止时间（默认显示7天内）"
-    echo "  check --all         显示所有作业（含远期）"
+    echo "  check              扫描作业截止时间（全部显示）"
     echo "  verify <课程>       对指定课程执行规范自检"
     echo "  verify --all        对所有课程执行规范自检"
     echo "  upload <课程>       打包并上传指定课程作业"
@@ -72,11 +71,7 @@ main() {
 
     case "$cmd" in
         check)
-            if [ "${2:-}" = "--all" ]; then
-                deadline_check "true"
-            else
-                deadline_check "false"
-            fi
+            deadline_check
             ;;
         verify)
             if [ "${2:-}" = "--all" ]; then

@@ -12,8 +12,6 @@ source "$(dirname "${BASH_SOURCE[0]}")/common.sh"
 
 # 扫描并展示所有作业截止状态
 deadline_check() {
-    local show_all="${1:-false}"
-
     echo ""
     bold "========== 作业截止时间总览 =========="
     echo ""
@@ -59,14 +57,19 @@ deadline_check() {
         log_info "deadline check: $course  DDL=$ddl  remaining=$remaining seconds"
     done < <(config_list_courses)
 
-    # 按紧急度输出
-    [ -n "$expired" ] && echo "$expired"
-    [ -n "$today" ]   && echo "$today"
-    [ -n "$soon" ]    && echo "$soon"
-    [ -n "$week" ]    && echo "$week"
+    # 按紧急度输出（紧急优先，其余紧随）
+    local has_urgent=false
+    if [ -n "$expired$today$soon" ]; then
+        has_urgent=true
+        [ -n "$expired" ] && echo "$expired"
+        [ -n "$today" ]   && echo "$today"
+        [ -n "$soon" ]    && echo "$soon"
+    fi
+    [ -n "$week" ]  && echo "$week"
+    [ -n "$later" ] && echo "$later"
 
-    if [ "$show_all" = "true" ]; then
-        [ -n "$later" ] && echo "$later"
+    if [ "$has_urgent" = true ]; then
+        red "  ⚠ 有过期或即将到期作业，请及时处理!"
     fi
 
     echo ""
