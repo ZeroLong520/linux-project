@@ -1,71 +1,71 @@
 #!/bin/bash
 # ============================================================
-# guardian.sh — 作业守护者 主入口
-# 用法:
-#   ./guardian.sh check              扫描作业截止时间
-#   ./guardian.sh check --all         显示所有作业（含远期）
-#   ./guardian.sh verify <课程>       对指定课程执行规范自检
-#   ./guardian.sh verify --all        对所有课程执行规范自检
-#   ./guardian.sh upload <课程>       打包并上传作业
-#   ./guardian.sh upload --dry <课程> 试运行模式
-#   ./guardian.sh extract [目录]      提取作业需求关键字
-#   ./guardian.sh status              总览面板
-#   ./guardian.sh help                显示帮助
+# guardian.sh 鈥?浣滀笟瀹堟姢鑰?涓诲叆鍙?
+# 鐢ㄦ硶:
+#   ./guardian.sh check              鎵弿浣滀笟鎴鏃堕棿
+#   ./guardian.sh check --all         鏄剧ず鎵€鏈変綔涓氾紙鍚繙鏈燂級
+#   ./guardian.sh verify <璇剧▼>       瀵规寚瀹氳绋嬫墽琛岃鑼冭嚜妫€
+#   ./guardian.sh verify --all        瀵规墍鏈夎绋嬫墽琛岃鑼冭嚜妫€
+#   ./guardian.sh upload <璇剧▼>       鎵撳寘骞朵笂浼犱綔涓?
+#   ./guardian.sh upload --dry <璇剧▼> 璇曡繍琛屾ā寮?
+#   ./guardian.sh extract [鐩綍]      鎻愬彇浣滀笟闇€姹傚叧閿瓧
+#   ./guardian.sh status              鎬昏闈㈡澘
+#   ./guardian.sh help                鏄剧ず甯姪
 # ============================================================
 
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-# 加载模块库
-# 加载模块库（先 common，之后用 PROJECT_ROOT 定位）
+# 鍔犺浇妯″潡搴?
+# 鍔犺浇妯″潡搴擄紙鍏?common锛屼箣鍚庣敤 PROJECT_ROOT 瀹氫綅锛?
 source "$SCRIPT_DIR/lib/common.sh"
 source "$PROJECT_ROOT/lib/deadline.sh"
 source "$PROJECT_ROOT/lib/checker.sh"
 source "$PROJECT_ROOT/lib/uploader.sh"
 source "$PROJECT_ROOT/lib/extractor.sh"
 
-# -------------------- 帮助信息 --------------------
+# -------------------- 甯姪淇℃伅 --------------------
 show_help() {
-    echo "用法: ./guardian.sh <命令> [参数]"
+    echo "鐢ㄦ硶: ./guardian.sh <鍛戒护> [鍙傛暟]"
     echo ""
-    echo "命令:"
-    echo "  check              扫描作业截止时间（全部显示）"
-    echo "  verify <课程>       对指定课程执行规范自检"
-    echo "  verify --all        对所有课程执行规范自检"
-    echo "  upload <课程>       打包并上传指定课程作业"
-    echo "  upload --dry <课程> 试运行模式（只展示，不上传）"
-    echo "  extract [目录]      从目录中提取作业需求关键字"
-    echo "  status              显示所有作业状态总览"
-    echo "  help                显示此帮助"
+    echo "鍛戒护:"
+    echo "  check              鎵弿浣滀笟鎴鏃堕棿锛堝叏閮ㄦ樉绀猴級"
+    echo "  verify <璇剧▼>       瀵规寚瀹氳绋嬫墽琛岃鑼冭嚜妫€"
+    echo "  verify --all        瀵规墍鏈夎绋嬫墽琛岃鑼冭嚜妫€"
+    echo "  upload <璇剧▼>       鎵撳寘骞朵笂浼犳寚瀹氳绋嬩綔涓?
+    echo "  upload --dry <璇剧▼> 璇曡繍琛屾ā寮忥紙鍙睍绀猴紝涓嶄笂浼狅級"
+    echo "  extract [鐩綍]      浠庣洰褰曚腑鎻愬彇浣滀笟闇€姹傚叧閿瓧"
+    echo "  status              鏄剧ず鎵€鏈変綔涓氱姸鎬佹€昏"
+    echo "  help                鏄剧ず姝ゅ府鍔?
     echo ""
-    echo "示例:"
+    echo "绀轰緥:"
     echo "  ./guardian.sh check"
     echo "  ./guardian.sh verify linux"
     echo "  ./guardian.sh upload --dry linux"
-    echo "  ./guardian.sh extract ~/课件/"
+    echo "  ./guardian.sh extract ~/璇句欢/"
 }
 
-# -------------------- 状态总览 --------------------
+# -------------------- 鐘舵€佹€昏 --------------------
 show_status() {
     echo ""
-    bold "========== 作业守护者 — 状态总览 =========="
+    bold "========== 浣滀笟瀹堟姢鑰?鈥?鐘舵€佹€昏 =========="
     echo ""
-    echo "  配置文件: $CONFIG_FILE"
-    echo "  日志文件: $LOG_FILE"
-    echo "  课程数量: $(config_list_courses | wc -l)"
+    echo "  閰嶇疆鏂囦欢: $CONFIG_FILE"
+    echo "  鏃ュ織鏂囦欢: $LOG_FILE"
+    echo "  璇剧▼鏁伴噺: $(config_list_courses | wc -l)"
     echo ""
-    echo "  课程列表:"
+    echo "  璇剧▼鍒楄〃:"
     while IFS= read -r course; do
         local ddl submit
         ddl=$(config_get "$course" "ddl")
         submit=$(config_get "$course" "submit")
-        printf "    %-10s  DDL: %-16s  提交: %s\n" "$course" "$ddl" "$submit"
+        printf "    %-10s  DDL: %-16s  鎻愪氦: %s\n" "$course" "$ddl" "$submit"
     done < <(config_list_courses)
     echo ""
 }
 
-# -------------------- 主入口 --------------------
+# -------------------- 涓诲叆鍙?--------------------
 main() {
     local cmd="${1:-help}"
 
@@ -79,8 +79,8 @@ main() {
             elif [ -n "${2:-}" ]; then
                 checker_verify "${2}" "."
             else
-                red "错误: 请指定课程名，或使用 --all 检查所有"
-                echo "示例: ./guardian.sh verify linux"
+                red "閿欒: 璇锋寚瀹氳绋嬪悕锛屾垨浣跨敤 --all 妫€鏌ユ墍鏈?
+                echo "绀轰緥: ./guardian.sh verify linux"
                 exit 1
             fi
             ;;
@@ -90,8 +90,8 @@ main() {
             elif [ -n "${2:-}" ]; then
                 uploader_upload "${2}" "false"
             else
-                red "错误: 请指定课程名"
-                echo "示例: ./guardian.sh upload linux"
+                red "閿欒: 璇锋寚瀹氳绋嬪悕"
+                echo "绀轰緥: ./guardian.sh upload linux"
                 exit 1
             fi
             ;;
@@ -105,7 +105,7 @@ main() {
             show_help
             ;;
         *)
-            red "未知命令: $cmd"
+            red "鏈煡鍛戒护: $cmd"
             echo ""
             show_help
             exit 1

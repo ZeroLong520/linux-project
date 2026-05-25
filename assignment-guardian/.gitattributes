@@ -1,0 +1,4 @@
+﻿# 强制 .sh / .conf 使用 LF 换行符
+*.sh text eol=lf
+*.conf text eol=lf
+*.md text eol=lf
