@@ -31,7 +31,7 @@ deadline_check() {
         submit=$(config_get "$course" "submit")
         submit="${submit:-未知}"
 
-        ((total++))
+        total=$((total + 1))
 
         local line
         line="  [$(printf '%-8s' "$course")] DDL: $(printf '%-16s' "$ddl") | 提交: $(printf '%-5s' "$submit") | "
