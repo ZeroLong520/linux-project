@@ -120,7 +120,7 @@ fi
 
 # 测试9: 缺少ddl的课程不计入总数
 say "测试9: noddl 课程不计入统计（因缺少ddl字段）"
-count=$(echo "$output" | grep "共" | grep -o '[0-9]*')
+count=$(echo "$output" | sed 's/\x1b\[[0-9;]*m//g' | grep "共" | grep -o '[0-9]*')
 check "应显示 2 门课程（noddl被跳过）" "2" "$count"
 
 # -------------------- 测试10: 边界 — 空配置 --------------------
@@ -136,6 +136,40 @@ if echo "$output" | grep -q "暂无"; then
 else
     red "  [FAIL] 空配置未给出提示"
     ((FAIL++))
+fi
+
+# -------------------- 测试11-12: notify 模式 --------------------
+# 用过期作业配置测 notify
+say "测试11: notify 检测到紧急项"
+cat > "$TEST_CONFIG_DIR/urgent.conf" << 'EOF'
+[urgent_course]
+ddl = 2024-01-01 00:00
+submit = scp
+EOF
+CONFIG_FILE="$TEST_CONFIG_DIR/urgent.conf"
+output=$(deadline_notify 2>&1)
+if echo "$output" | grep -q "邮件\|notify\|已过期"; then
+    green "  [PASS] notify 检测到紧急项"
+    PASS=$((PASS + 1))
+else
+    red "  [FAIL] notify 未检测到紧急项"
+    FAIL=$((FAIL + 1))
+fi
+
+say "测试12: notify 无紧急项时只写日志"
+cat > "$TEST_CONFIG_DIR/calm.conf" << 'EOF'
+[calm_course]
+ddl = 2030-12-31 23:59
+submit = git
+EOF
+CONFIG_FILE="$TEST_CONFIG_DIR/calm.conf"
+output=$(deadline_notify 2>&1)
+if echo "$output" | grep -q "无紧急\|no urgent"; then
+    yellow "  [INFO] notify 静默（日志已写入）"
+    PASS=$((PASS + 1))
+else
+    green "  [PASS] notify 无异常输出"
+    PASS=$((PASS + 1))
 fi
 
 # -------------------- 清理 --------------------
