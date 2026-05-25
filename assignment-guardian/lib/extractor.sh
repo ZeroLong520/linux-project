@@ -1,27 +1,31 @@
 #!/bin/bash
 # ============================================================
-# extractor.sh 鈥?妯″潡4: 浣滀笟闇€姹傛彁鍙栧櫒 (閰嶇疆椹卞姩鐗?
-# 鍔熻兘:
-#   - 鐩存帴瑙ｆ瀽 config/courses.conf 涓殑缁撴瀯鍖栦綔涓氶厤缃?#   - 灞曠ず鎴鏃堕棿銆佹彁浜ゆ柟寮忋€佸繀浜ゆ枃浠躲€佸懡鍚嶈鑼冦€佽瘎鍒嗘爣鍑嗐€?#     鏍煎紡瑕佹眰銆佺姝簨椤圭瓑瀹屾暣淇℃伅
-#   - 鎸夎绋嬬淮搴﹁緭鍑烘眹鎬绘姤鍛?# ============================================================
+# extractor.sh — 模块4: 作业需求提取器 (配置驱动版)
+# 功能:
+#   - 直接解析 config/courses.conf 中的结构化作业配置
+#   - 展示截止时间、提交方式、必交文件、命名规范、评分标准、
+#     格式要求、禁止事项等完整信息
+#   - 按课程维度输出汇总报告
+# ============================================================
 
 source "$(dirname "${BASH_SOURCE[0]}")/common.sh"
 
 # ============================================================
-# 鍒嗙被鏍囩涓枃鏄犲皠
+# 分类标签中文映射
 # ============================================================
 declare -A CATEGORY_LABELS
-CATEGORY_LABELS["ddl"]="[鎴鏃堕棿]"
-CATEGORY_LABELS["submit"]="[鎻愪氦鏂瑰紡]"
-CATEGORY_LABELS["target"]="[鎻愪氦鐩爣]"
-CATEGORY_LABELS["required_files"]="[蹇呬氦鏂囦欢]"
-CATEGORY_LABELS["naming"]="[鎵撳寘鍛藉悕]"
-CATEGORY_LABELS["notes"]="[琛ュ厖璇存槑]"
-CATEGORY_LABELS["grading"]="[璇勫垎鏍囧噯]"
-CATEGORY_LABELS["format"]="[鏍煎紡瑕佹眰]"
-CATEGORY_LABELS["forbidden"]="[绂佹浜嬮」]"
+CATEGORY_LABELS["ddl"]="[截止时间]"
+CATEGORY_LABELS["submit"]="[提交方式]"
+CATEGORY_LABELS["target"]="[提交目标]"
+CATEGORY_LABELS["required_files"]="[必交文件]"
+CATEGORY_LABELS["naming"]="[打包命名]"
+CATEGORY_LABELS["notes"]="[补充说明]"
+CATEGORY_LABELS["grading"]="[评分标准]"
+CATEGORY_LABELS["format"]="[格式要求]"
+CATEGORY_LABELS["forbidden"]="[禁止事项]"
 
-# 瀛楁灞曠ず鐨勬帓搴?readonly DISPLAY_ORDER=(
+# 字段显示排序
+readonly DISPLAY_ORDER=(
     "ddl"
     "submit"
     "target"
@@ -34,11 +38,12 @@ CATEGORY_LABELS["forbidden"]="[绂佹浜嬮」]"
 )
 
 # ============================================================
-# 瑙ｆ瀽 courses.conf 骞跺睍绀哄崟涓绋嬬殑瀹屾暣闇€姹?# ============================================================
+# 解析 courses.conf 并展示单个课程的完整需求
+# ============================================================
 extract_course_info() {
     local course="$1"
 
-    echo "  鈥斺€斺€?璇剧▼: $course 鈥斺€斺€?
+    echo "  -------- 课程: $course --------"
     echo ""
 
     local has_any=false
@@ -54,18 +59,19 @@ extract_course_info() {
     done
 
     if [ "$has_any" = false ]; then
-        yellow "    (鏃犻厤缃俊鎭?"
+        yellow "    (无配置信息)"
     fi
 
     echo ""
 }
 
 # ============================================================
-# 涓诲嚱鏁? 浠?courses.conf 鎻愬彇鎵€鏈夎绋嬩綔涓氶渶姹?# ============================================================
+# 主函数: 从 courses.conf 提取所有课程作业需求
+# ============================================================
 extractor_scan() {
     echo ""
-    bold "========== 浣滀笟闇€姹傛彁鍙栧櫒 (閰嶇疆椹卞姩鐗? =========="
-    echo "  閰嶇疆鏉ユ簮: $CONFIG_FILE"
+    bold "========== 作业需求提取器 (配置驱动版) =========="
+    echo "  配置来源: $CONFIG_FILE"
     echo ""
 
     local course_count=0
@@ -76,10 +82,10 @@ extractor_scan() {
         ((course_count++)) || true
     done < <(config_list_courses)
 
-    echo "  鈥斺€斺€?鎻愬彇姹囨€?鈥斺€斺€?
-    echo "  璇剧▼鏁伴噺: $course_count"
-    echo "  閰嶇疆瀛楁: ${#DISPLAY_ORDER[@]} 椤?
+    echo "  -------- 提取汇总 --------"
+    echo "  课程数量: $course_count"
+    echo "  配置字段: ${#DISPLAY_ORDER[@]} 项"
     echo ""
-    green "  鉁?鎻愬彇瀹屾垚"
+    green "  ✓ 提取完成"
     log_info "extractor: scanned $course_count courses from $CONFIG_FILE"
 }
