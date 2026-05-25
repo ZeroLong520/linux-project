@@ -61,7 +61,8 @@ test_large_log() {
     file_size=$(du -h "$large_log" | cut -f1)
     log_test "鐢熸垚鏂囦欢澶у皬: $file_size"
 
-    # 1.2: 鏃ュ織鍐欏叆鎬ц兘 鈥?5000鏉¤繛缁啓鍏?    local bench_log="$PROJECT_ROOT/logs/bench_write.log"
+    # 1.2: 鏃ュ織鍐欏叆鎬ц兘 鈥?5000鏉¤繛缁啓鍏?
+    local bench_log="$PROJECT_ROOT/logs/bench_write.log"
     > "$bench_log"
     local start_time end_time elapsed
     start_time=$(date +%s)
@@ -122,11 +123,12 @@ test_disk_full() {
     bold "========== 杈圭晫娴嬭瘯2: 纾佺洏绌洪棿涓嶈冻 =========="
     echo ""
 
-    # 2.1: 妫€鏌ュ綋鍓嶇鐩樺彲鐢ㄧ┖闂?    local disk_info avail
+    # 2.1: 妫€鏌ュ綋鍓嶇鐩樺彲鐢ㄧ┖闂?
+    local disk_info avail
     disk_info=$(df -h "$PROJECT_ROOT" 2>/dev/null | tail -1 || echo "")
     avail=$(echo "$disk_info" | awk '{print $4}' 2>/dev/null || echo "unknown")
     log_test "褰撳墠纾佺洏鍙敤绌洪棿: $avail"
-    assert_pass "纾佺洏婊? 褰撳墠鍙敤绌洪棿=$avail"
+    assert_pass "test passed"
 
     # 2.2: 娴嬭瘯鍦ㄥ彧璇荤洰褰曚腑鍐欏叆鏃ュ織
     local test_dir="$PROJECT_ROOT/fixtures/disk_test"
@@ -136,25 +138,28 @@ test_disk_full() {
     mkdir -p "$readonly_dir"
     chmod 444 "$readonly_dir" 2>/dev/null || true
 
-    # 灏濊瘯鍦ㄥ彧璇荤洰褰曞垱寤烘枃浠?鈥?搴斿け璐?    if touch "$readonly_dir/test.log" 2>/dev/null; then
-        assert_fail "纾佺洏婊? 鍦ㄥ彧璇荤洰褰曞垱寤烘枃浠跺簲澶辫触"
+    # Try creating file in read-only dir — should fail
+    if touch "$readonly_dir/test.log" 2>/dev/null; then
+        assert_fail "test failed"
         chmod 755 "$readonly_dir" 2>/dev/null || true
     else
-        assert_pass "纾佺洏婊? 鍙鐩綍姝ｇ‘鎷掔粷鍐欏叆"
+        assert_pass "test passed"
     fi
 
     chmod 755 "$readonly_dir" 2>/dev/null || true
 
-    # 2.3: logs 鐩綍鍙啓鎬ф鏌?    if [ -w "$LOG_DIR" ]; then
-        assert_pass "纾佺洏婊? logs鐩綍鍙啓"
+    # 2.3: check logs dir writability
+    if [ -w "$LOG_DIR" ]; then
+        assert_pass "test passed"
     else
-        assert_fail "纾佺洏婊? logs鐩綍涓嶅彲鍐?
+        assert_fail "纾佺洏婊? logstest completed"
     fi
 
-    # 2.4: config 鏂囦欢鍙鎬ф鏌?    if [ -r "$CONFIG_FILE" ]; then
-        assert_pass "纾佺洏婊? courses.conf 鍙"
+    # 2.4: check config file readability
+    if [ -r "$CONFIG_FILE" ]; then
+        assert_pass "test passed"
     else
-        assert_fail "纾佺洏婊? courses.conf 涓嶅彲璇?
+        assert_fail "纾佺洏婊? courses.conf test completed"
     fi
 
     rm -rf "$test_dir"
@@ -182,12 +187,13 @@ test_cpu_full() {
     end_time=$(date +%s%N)
     local elapsed=$(( (end_time - start_time) / 1000000 ))
     if [ "$elapsed" -lt 5000 ]; then
-        assert_pass "CPU婊¤浇: 500娆onfig_get鑰楁椂${elapsed}ms (<5s)"
+        assert_pass "test completed"
     else
-        assert_fail "CPU婊¤浇: 500娆onfig_get鑰楁椂${elapsed}ms"
+        assert_fail "test completed"
     fi
 
-    # 3.2: 椤哄簭鎵ц extractor_scan 10娆?    log_test "椤哄簭璋冪敤 extractor_scan 脳 10..."
+    # 3.2: 椤哄簭鎵ц extractor_scan 10娆?
+    log_test "椤哄簭璋冪敤 extractor_scan 脳 10..."
     start_time=$(date +%s%N)
     if source "$PROJECT_ROOT/lib/extractor.sh" 2>/dev/null; then
         for i in $(seq 1 10); do
@@ -197,9 +203,9 @@ test_cpu_full() {
     end_time=$(date +%s%N)
     elapsed=$(( (end_time - start_time) / 1000000 ))
     if [ "$elapsed" -lt 10000 ]; then
-        assert_pass "CPU婊¤浇: extractor_scan 脳10鑰楁椂${elapsed}ms (<10s)"
+        assert_pass "test completed"
     else
-        assert_fail "CPU婊¤浇: extractor_scan 脳10鑰楁椂${elapsed}ms"
+        assert_fail "test completed"
     fi
 
     # 3.3: 骞跺彂鎵ц妯℃嫙 鈥?4涓悗鍙拌繘绋嬭皟鐢?config_get
@@ -220,17 +226,18 @@ test_cpu_full() {
     end_time=$(date +%s%N)
     elapsed=$(( (end_time - start_time) / 1000000 ))
     if [ "$elapsed" -lt 30000 ]; then
-        assert_pass "CPU婊¤浇: 4骞跺彂config_get鑰楁椂${elapsed}ms (<30s)"
+        assert_pass "test completed"
     else
-        assert_fail "CPU婊¤浇: 4骞跺彂config_get鑰楁椂${elapsed}ms"
+        assert_fail "test completed"
     fi
 
-    # 3.4: 绯荤粺鍦ㄩ珮璐熻浇涓嬩粛鑳藉搷搴?    local resp
+    # 3.4: 绯荤粺鍦ㄩ珮璐熻浇涓嬩粛鑳藉搷搴?
+    local resp
     resp=$(date +%s 2>/dev/null || echo 0)
     if [ "$resp" -gt 0 ]; then
-        assert_pass "CPU婊¤浇: 楂樿礋杞戒笅绯荤粺缁存姢鍝嶅簲鑳藉姏"
+        assert_pass "test completed"
     else
-        assert_fail "CPU婊¤浇: 绯荤粺鏃犲搷搴?
+        assert_fail "CPU婊¤浇: test completed"
     fi
 }
 
@@ -239,10 +246,11 @@ test_cpu_full() {
 # ============================================================
 test_stress_combined() {
     echo ""
-    bold "========== 杈圭晫娴嬭瘯4: 缁煎悎鍘嬪姏娴嬭瘯 (閰嶇疆椹卞姩鐗? =========="
+    bold "========== Boundary Test 4: Combined Stress =========="
     echo ""
 
-    # 4.1: 鍏ㄩ噺 config_get 璇诲彇鎵€鏈夎绋嬫墍鏈夊瓧娈?    local start_time end_time
+    # 4.1: 鍏ㄩ噺 config_get 璇诲彇鎵€鏈夎绋嬫墍鏈夊瓧娈?
+    local start_time end_time
     start_time=$(date +%s%N)
     local fields=("ddl" "submit" "target" "required_files" "naming" "grading" "format" "forbidden" "notes")
     local total_reads=0
@@ -259,7 +267,7 @@ test_stress_combined() {
     if [ "$elapsed" -lt 5000 ]; then
         assert_pass "缁煎悎鍘嬪姏: ${total_reads}娆onfig_get鑰楁椂${elapsed}ms (<5s)"
     else
-        assert_fail "缁煎悎鍘嬪姏: ${total_reads}娆¤鍙栬€楁椂${elapsed}ms"
+        assert_fail "test completed"
     fi
 
     # 4.2: deadline_check 鍘嬪姏娴嬭瘯
@@ -276,7 +284,8 @@ test_stress_combined() {
         assert_fail "缁煎悎鍘嬪姏: deadline_check 鑰楁椂${elapsed}ms"
     fi
 
-    # 4.3: 鍚屾椂璋冪敤 extractor + deadline + checker 涓嶅啿绐?    log_test "澶氭ā鍧楀苟鍙戞祴璇?.."
+    # 4.3: 鍚屾椂璋冪敤 extractor + deadline + checker 涓嶅啿绐?
+    log_test "澶氭ā鍧楀苟鍙戞祴璇?.."
     start_time=$(date +%s%N)
     (
         source "$PROJECT_ROOT/lib/extractor.sh" 2>/dev/null
@@ -295,7 +304,8 @@ test_stress_combined() {
         assert_fail "缁煎悎鍘嬪姏: extractor+deadline 骞跺彂鑰楁椂${elapsed}ms"
     fi
 
-    # 4.4: 楠岃瘉鎵€鏈夎绋嬪瓧娈靛畬鏁存€?    local field_count=0
+    # 4.4: 楠岃瘉鎵€鏈夎绋嬪瓧娈靛畬鏁存€?
+    local field_count=0
     while IFS= read -r course; do
         [ -z "$course" ] && continue
         for field in "${fields[@]}"; do
@@ -307,9 +317,9 @@ test_stress_combined() {
         done
     done < <(config_list_courses)
     if [ "$field_count" -ge 18 ]; then  # 3 courses 脳 6+ fields each
-        assert_pass "缁煎悎鍘嬪姏: 閰嶇疆瀛楁瀹屾暣鎬?鈥?${field_count} 涓潪绌哄瓧娈?
+        assert_pass "缁煎悎鍘嬪姏: 閰嶇疆瀛楁瀹屾暣鎬?鈥?${field_count} test completed"
     else
-        assert_fail "缁煎悎鍘嬪姏: 閰嶇疆瀛楁涓嶈冻 鈥?浠?${field_count} 涓?
+        assert_fail "缁煎悎鍘嬪姏: 閰嶇疆瀛楁涓嶈冻 鈥?浠?${field_count} test completed"
     fi
 }
 
@@ -318,7 +328,7 @@ test_stress_combined() {
 main() {
     echo ""
     bold "鈺斺晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晽"
-    bold "鈺?  Assignment Guardian 鈥?杈圭晫娴嬭瘯濂椾欢        鈺?
+    bold "鈺?  Assignment Guardian 鈥?杈圭晫娴嬭瘯濂椾欢        test completed"
     bold "鈺氣晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨暆"
     echo ""
 
