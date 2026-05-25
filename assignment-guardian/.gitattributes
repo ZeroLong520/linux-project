@@ -1,0 +1,2 @@
+# 所有文本文件强制使用 LF 换行符（Linux要求）
+* text eol=lf

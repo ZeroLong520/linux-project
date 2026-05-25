@@ -19,11 +19,7 @@ mkdir -p "$LOG_DIR"
 # -------------------- 终端彩色输出 --------------------
 _color() {
     local code="$1"; shift
-    if [ -t 1 ]; then
-        echo -e "\033[${code}m$*\033[0m"
-    else
-        echo "$*"
-    fi
+    printf '\033[%sm%s\033[0m\n' "$code" "$*"
 }
 
 red()    { _color 31 "$@"; }
@@ -102,13 +98,13 @@ human_readable_time() {
 }
 
 # 计算距离DDL还有多少秒
+# 失败时无输出 + 返回非0，调用方通过 || 兜底
 ddl_remaining_seconds() {
     local ddl_str="$1"
     local ddl_epoch
-    ddl_epoch=$(date -d "$ddl_str" +%s 2>/dev/null || echo 0)
+    ddl_epoch=$(date -d "$ddl_str" +%s 2>/dev/null) || return 1
 
     if [ "$ddl_epoch" = "0" ]; then
-        echo 0
         return 1
     fi
 

@@ -9,6 +9,7 @@
 #   ./guardian.sh upload <课程>       打包并上传作业
 #   ./guardian.sh upload --dry <课程> 试运行模式
 #   ./guardian.sh extract [目录]      提取作业需求关键字
+#   ./guardian.sh notify              扫描紧急项并发邮件通知(cron用)
 #   ./guardian.sh status              总览面板
 #   ./guardian.sh help                显示帮助
 # ============================================================
@@ -36,6 +37,7 @@ show_help() {
     echo "  upload <课程>       打包并上传指定课程作业"
     echo "  upload --dry <课程> 试运行模式（只展示，不上传）"
     echo "  extract [目录]      从目录中提取作业需求关键字"
+    echo "  notify             扫描紧急作业并发邮件通知（供 crontab 调用）"
     echo "  status              显示所有作业状态总览"
     echo "  help                显示此帮助"
     echo ""
@@ -97,6 +99,9 @@ main() {
             ;;
         extract)
             extractor_scan "${2:-.}"
+            ;;
+        notify)
+            deadline_notify
             ;;
         status)
             show_status
