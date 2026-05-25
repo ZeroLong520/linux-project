@@ -1,0 +1,3 @@
+# 所有Shell脚本强制使用 LF 换行符（Linux要求）
+*.sh text eol=lf
+*.conf text eol=lf
