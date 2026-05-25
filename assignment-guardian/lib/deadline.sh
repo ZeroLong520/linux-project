@@ -10,16 +10,13 @@
 
 source "$(dirname "${BASH_SOURCE[0]}")/common.sh"
 
-# 扫描并展示所有作业截止状态
 deadline_check() {
     echo ""
     bold "========== 作业截止时间总览 =========="
     echo ""
 
-    local now_epoch
-    now_epoch=$(date +%s)
-
     local expired="" today="" soon="" week="" later=""
+    local total=0
 
     while IFS= read -r course; do
         local ddl
@@ -32,32 +29,40 @@ deadline_check() {
 
         local submit
         submit=$(config_get "$course" "submit")
+        submit="${submit:-未知}"
+
+        ((total++))
 
         local line
-        line=$(printf "  [%-8s] DDL: %s | 提交: %-5s | " "$course" "$ddl" "$submit")
+        line="  [$(printf '%-8s' "$course")] DDL: $(printf '%-16s' "$ddl") | 提交: $(printf '%-5s' "$submit") | "
 
         if [ "$remaining" -lt 0 ]; then
-            local abs=$(( -remaining ))
-            line+="$(red "已过期 $(human_readable_time $abs)")"
+            line+="$(red "已过期 $(human_readable_time $((-remaining)))")"
             expired+="$line"$'\n'
         elif [ "$remaining" -lt 86400 ]; then
             line+="$(red "今天截止!")"
             today+="$line"$'\n'
         elif [ "$remaining" -lt 259200 ]; then
-            line+="$(yellow "剩余 $(human_readable_time $remaining)")"
+            line+="$(yellow "剩余 $(human_readable_time "$remaining")")"
             soon+="$line"$'\n'
         elif [ "$remaining" -lt 604800 ]; then
-            line+="$(blue "剩余 $(human_readable_time $remaining)")"
+            line+="$(blue "剩余 $(human_readable_time "$remaining")")"
             week+="$line"$'\n'
         else
-            line+="$(green "剩余 $(human_readable_time $remaining)")"
+            line+="$(green "剩余 $(human_readable_time "$remaining")")"
             later+="$line"$'\n'
         fi
 
-        log_info "deadline check: $course  DDL=$ddl  remaining=$remaining seconds"
+        log_info "deadline check: $course  DDL=$ddl  submit=$submit  remaining=${remaining}s"
     done < <(config_list_courses)
 
-    # 按紧急度输出（紧急优先，其余紧随）
+    if [ "$total" -eq 0 ]; then
+        yellow "  暂无配置有效DDL的课程，请检查 config/courses.conf"
+        echo ""
+        return
+    fi
+
+    # 按紧急度输出（紧急优先）
     local has_urgent=false
     if [ -n "$expired$today$soon" ]; then
         has_urgent=true
@@ -73,6 +78,6 @@ deadline_check() {
     fi
 
     echo ""
-    green "共 $(config_list_courses | wc -l) 门课程"
+    green "共 ${total} 门课程"
     echo ""
 }
