@@ -123,6 +123,23 @@ in_range() {
     [ "$val" -ge "$min" ] && [ "$val" -le "$max" ]
 }
 
+# 查看指定课程的全部配置
+config_show() {
+    local course="$1"
+    echo ""
+    bold "========== 课程配置: $course =========="
+    echo ""
+    local fields=(ddl submit target required_files naming notes grading format forbidden)
+    for field in "${fields[@]}"; do
+        local value
+        value=$(config_get "$course" "$field" 2>/dev/null || true)
+        if [ -n "$value" ]; then
+            printf "  %-16s %s\n" "$field:" "$value"
+        fi
+    done
+    echo ""
+}
+
 # -------------------- 自检 --------------------
 # 确保配置文件存在，否则报错
 if [ ! -f "$CONFIG_FILE" ]; then

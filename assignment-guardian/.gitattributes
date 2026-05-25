@@ -1,0 +1,4 @@
+# Force LF line endings for .sh / .conf / .md files
+*.sh text eol=lf
+*.conf text eol=lf
+*.md text eol=lf
