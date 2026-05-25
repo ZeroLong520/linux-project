@@ -19,11 +19,7 @@ mkdir -p "$LOG_DIR"
 # -------------------- 终端彩色输出 --------------------
 _color() {
     local code="$1"; shift
-    if [ -t 1 ]; then
-        echo -e "\033[${code}m$*\033[0m"
-    else
-        echo "$*"
-    fi
+    printf '\033[%sm%s\033[0m\n' "$code" "$*"
 }
 
 red()    { _color 31 "$@"; }
