@@ -29,13 +29,16 @@ show_help() {
     echo "用法: ./guardian.sh <命令> [参数]"
     echo ""
     echo "命令:"
-    echo "  check              扫描作业截止时间"
+    echo "  check              扫描作业截止时间（传统格式）"
+    echo "  scan               截止时间颜色扫描（按紧迫程度着色）"
     echo "  verify <课程>       对指定课程执行规范自检"
     echo "  verify --all        对所有课程执行规范自检"
     echo "  package <课程>      仅打包作业（不上传）"
     echo "  upload <课程>       打包并上传指定课程作业"
     echo "  upload --dry <课程> 试运行模式（只展示，不上传）"
     echo "  extract [目录]      从目录中提取作业需求关键字"
+    echo "  notify             发送今日截止任务邮件提醒"
+    echo "  schedule            设置/查看定时扫描任务"
     echo "  config <课程>       查看课程配置"
     echo "  status              显示所有作业状态总览"
     echo "  help                显示此帮助"
@@ -45,10 +48,13 @@ show_help() {
     echo "  --skip-verify       跳过前置规范检查"
     echo ""
     echo "示例:"
+    echo "  ./guardian.sh scan"
     echo "  ./guardian.sh check"
     echo "  ./guardian.sh verify linux"
     echo "  ./guardian.sh upload --dry linux"
     echo "  ./guardian.sh upload --skip-verify linux"
+    echo "  ./guardian.sh notify"
+    echo "  ./guardian.sh schedule"
     echo "  ./guardian.sh extract ~/课件/"
 }
 
@@ -102,6 +108,10 @@ main() {
             deadline_check
             ;;
 
+        scan)
+            checker_deadline_scan
+            ;;
+
         verify)
             if [ "$course" = "--all" ]; then
                 checker_verify_all "."
@@ -134,6 +144,14 @@ main() {
 
         extract)
             extractor_scan "${course:-.}"
+            ;;
+
+        notify)
+            checker_notify_today
+            ;;
+
+        schedule)
+            checker_schedule_setup
             ;;
 
         config)

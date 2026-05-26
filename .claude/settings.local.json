@@ -5,7 +5,23 @@
       "Bash(git -C \"d:/25-26-2-homework/linux_project\" log --oneline -10)",
       "Bash(git remote *)",
       "Bash(git add *)",
-      "Bash(git commit -m ' *)"
+      "Bash(git commit -m ' *)",
+      "Bash(ssh -o StrictHostKeyChecking=no root@192.168.150.101 'cd /linux-project/linux-project/assignment-guardian && source lib/checker.sh && checker_send_mail '\\\\''【测试】Assignment Guardian 邮件测试'\\\\'' '\\\\''你好， *)",
+      "Bash(ssh -o StrictHostKeyChecking=no root@192.168.150.101 \"cd /linux-project/linux-project/assignment-guardian && cat /linux-project/linux-project/assignment-guardian/logs/guardian.log | tail -20\")",
+      "Bash(scp -o StrictHostKeyChecking=no \"d:/25-26-2-homework/linux_project/assignment-guardian/lib/checker.sh\" root@192.168.150.101:/linux-project/linux-project/assignment-guardian/lib/checker.sh)",
+      "Bash(ssh -o StrictHostKeyChecking=no root@192.168.150.101 \"crond start 2>/dev/null || crond 2>/dev/null || /usr/sbin/crond 2>/dev/null; sleep 1; ps aux | grep crond | grep -v grep\")",
+      "Bash(ssh -o StrictHostKeyChecking=no root@192.168.150.101 \"cd /linux-project/linux-project/assignment-guardian && source lib/checker.sh && checker_schedule_setup\")",
+      "Bash(ssh -o StrictHostKeyChecking=no root@192.168.150.101 \"cd /linux-project/linux-project/assignment-guardian && source lib/checker.sh && checker_schedule_status\")",
+      "Bash(ssh -o StrictHostKeyChecking=no root@192.168.150.101 'cd /linux-project/linux-project/assignment-guardian && source lib/checker.sh && echo \"========== 测试1: 截止时间颜色扫描 ==========\" && checker_deadline_scan')",
+      "Bash(ssh -o StrictHostKeyChecking=no root@192.168.150.101 'cd /linux-project/linux-project/assignment-guardian && source lib/checker.sh && echo \"========== 测试2: 今日截止邮件提醒 ==========\" && checker_notify_today')",
+      "Bash(ssh -o StrictHostKeyChecking=no root@192.168.150.101 'cd /linux-project/linux-project/assignment-guardian && source lib/checker.sh && echo \"========== 测试3: 定时任务状态 ==========\" && checker_schedule_status')",
+      "Bash(bash -n assignment-guardian/guardian.sh)",
+      "Bash(scp -o StrictHostKeyChecking=no \"d:/25-26-2-homework/linux_project/assignment-guardian/guardian.sh\" root@192.168.150.101:/linux-project/linux-project/assignment-guardian/guardian.sh)",
+      "Bash(ssh -o StrictHostKeyChecking=no root@192.168.150.101 'cd /linux-project/linux-project/assignment-guardian && echo \"=== scan ===\" && ./guardian.sh scan && echo \"=== notify ===\" && ./guardian.sh notify && echo \"=== schedule ===\" && ./guardian.sh schedule && echo \"=== help ===\" && ./guardian.sh help')",
+      "Bash(bash -n assignment-guardian/lib/checker.sh)",
+      "Bash(scp -o StrictHostKeyChecking=no assignment-guardian/lib/checker.sh root@192.168.150.101:/linux-project/linux-project/assignment-guardian/lib/checker.sh)",
+      "Bash(ssh -o StrictHostKeyChecking=no root@192.168.150.101 'cd /linux-project/linux-project/assignment-guardian && ./guardian.sh scan')",
+      "Bash(scp -o StrictHostKeyChecking=no assignment-guardian/lib/checker.sh assignment-guardian/guardian.sh root@192.168.150.101:/linux-project/linux-project/assignment-guardian/)"
     ]
   }
 }
