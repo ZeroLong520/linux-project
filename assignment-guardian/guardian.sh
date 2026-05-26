@@ -109,7 +109,7 @@ main() {
             ;;
 
         scan)
-            checker_deadline_scan
+            deadline_scan
             ;;
 
         verify)
@@ -147,11 +147,11 @@ main() {
             ;;
 
         notify)
-            checker_notify_today
+            deadline_notify_today
             ;;
 
         schedule)
-            checker_schedule_setup
+            deadline_schedule_setup
             ;;
 
         config)

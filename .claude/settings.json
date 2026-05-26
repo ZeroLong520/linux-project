@@ -5,7 +5,10 @@
       "Bash(git pull *)",
       "Bash(git rm *)",
       "Bash(git commit -m ' *)",
-      "Bash(git merge *)"
+      "Bash(git merge *)",
+      "Bash(ssh -o StrictHostKeyChecking=no root@192.168.150.101 'bash -s')",
+      "Bash(scp -o StrictHostKeyChecking=no assignment-guardian/lib/checker.sh assignment-guardian/lib/deadline.sh assignment-guardian/guardian.sh root@192.168.150.101:/linux-project/linux-project/assignment-guardian/)",
+      "Bash(ssh -o StrictHostKeyChecking=no root@192.168.150.101 'cd /linux-project/linux-project/assignment-guardian && echo \"=== 1. check ===\" && ./guardian.sh check && echo \"=== 2. scan ===\" && ./guardian.sh scan && echo \"=== 3. notify ===\" && ./guardian.sh notify && echo \"=== 4. schedule ===\" && ./guardian.sh schedule && echo \"=== 5. verify linux ===\" && ./guardian.sh verify linux')"
     ]
   }
 }
